@@ -1,0 +1,42 @@
+
+// Bootstrap Variables
+$icon-font-path: '../../node_modules/bootstrap-sass/assets/fonts/bootstrap/';
+
+// Import Bootstrap
+@import '../../node_modules/bootstrap-sass/assets/stylesheets/bootstrap';
+
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.contain{
+  margin: 0 15px;
+}
+#quantity{
+  width: 150px;
+}
+.well{
+  .name{
+    display: inline-block;
+    color: rgb(46, 79, 100);
+  }
+  img {
+    display: inline-block;
+    height: 60px;
+    width: 60px;
+    margin: auto 20px;
+    border-radius: 3px;
+
+  }
+  button{
+    display: inline-block;
+    margin-left: 10px;
+  }
+}
+
+.input-area{
+  display: inline-block;
+}
