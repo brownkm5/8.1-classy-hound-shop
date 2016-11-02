@@ -9,7 +9,7 @@ var TemplateComponent = React.createClass({
           <div className="container-fluid">
             <ul className="nav navbar-nav">
             <li></li><a className="navbar-brand" href="#">Classy Hound</a><li></li>
-             <li className="tshirts"><a href="">Tshirts</a></li>
+             <li className="tshirts"><a href="#">Tshirts</a></li>
              <li><a href="#cart/">Cart</a></li>
             </ul>
           </div>

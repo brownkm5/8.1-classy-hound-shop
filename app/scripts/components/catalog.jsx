@@ -1,7 +1,7 @@
 var React = require('react');
 
 var TemplateComponent = require('./template.jsx');
-
+var OrderCollection = require('../models/model.js').OrderCollection;
 
 var CatalogComponent = React.createClass({
   initialize: function(){
@@ -38,8 +38,10 @@ var CatalogComponent = React.createClass({
             <div className="thumbnail">
               <img src={item.image} alt="picture" />
               <div className="caption">
-                <h3>{item.title}</h3>
-                <h4>$ {item.price}</h4>
+                <div className="title-price">
+                  <p id='title'>{item.title}</p>
+                  <p id='price'>$ {item.price}</p>
+                </div>
                 <div className="form-inline">
                   <input type="text" id='quantity' className="form-control" placeholder="Quantity" />
                   <select className="form-control">
@@ -66,6 +68,10 @@ var CatalogComponent = React.createClass({
 
 var CatalogContainer = React.createClass({
   getInitialState: function(){
+    var orderCollection = new OrderCollection();
+
+    orderCollection.fetch();
+
     var paintingArray = [
       {title:'Welsh Corgi', price:53.50, image:'http://rlv.zcache.com/pembroke_welsh_corgi_popart_poster_print-rdb9f920667ba4ed99dab6edbe0a611ec_wvg_8byvr_324.jpg'},
       {title:'Boxer', price:49.45, image:"http://rlv.zcache.com/boxer_dog_posters-r2bc77a8d788f4339b7e7c34543a1878e_wvc_8byvr_324.jpg"},
@@ -76,14 +82,34 @@ var CatalogContainer = React.createClass({
       {title:'Bavarian Dog Poster', price:23.55, image:'http://rlv.zcache.com/bavarian_dog_poster-r76b40ad27ece4031ae11b5cf9f04ee16_js8_8byvr_512.jpg'},
       {title:'Yellow Dog w/ Beer Glass', price:42.40, image:'http://rlv.zcache.com/yellow_dog_with_a_beer_glass_on_its_nose_poster-r0669933b08154b53ac63c27cdf0a0a94_ag4l_8byvr_512.jpg'},
       {title:'Black Dog w/ Beer Glass', price:7.95, image:'http://rlv.zcache.com/black_dog_with_a_beer_glass_on_its_nose_poster-r21a096c3cfca492cb391111147a90540_ag4l_8byvr_512.jpg'}
-    ]
+    ];
+
     return {
+      orderCollection: orderCollection,
       paintings: paintingArray
     }
   },
   handleAddToCart: function(item){
-    localStorage.setItem('order', JSON.stringify(item));
-    console.log(localStorage.getItem('order'));
+    console.log(item);
+    var orderCollection = this.state.orderCollection;
+
+    orderCollection.create(item);
+    this.updateOrder();
+
+    this.setState({orderCollection: orderCollection});
+
+  },
+  removeItem: function(item){
+    var orderCollection = this.state.orderCollection;
+
+    orderCollection.remove(item);
+    this.updateOrder();
+    this.setState({'orderCollection': orderCollection});
+  },
+  updateOrder: function(){
+    var orderCollection = this.state.orderCollection;
+    var orderData = JSON.stringify(orderCollection.toJSON());
+    localStorage.setItem('order', orderData);
   },
   render: function(){
     return(
