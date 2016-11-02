@@ -3,7 +3,23 @@ var React = require('react');
 var TemplateComponent = require('./template.jsx');
 
 var CartComponent = React.createClass({
+  handleRemove: function(item){
+
+    var cartOrder = JSON.parse(localStorage.getItem('order'));
+
+    for ( var i = 0; i < cartOrder.length; i++ ) {
+        if ( cartOrder[i].title === item.title ) {
+            // remove the object with item.title from the array
+            cartOrder.splice(i,1);
+        }
+    }
+
+    // insert the new stringified array into LocalStorage
+    localStorage.order = JSON.stringify(cartOrder);
+    
+  },
   render: function(){
+    var self = this;
     var cartData = this.props.cartItems.map(function(item){
       return(
         <tr key={item.title}>
@@ -11,7 +27,7 @@ var CartComponent = React.createClass({
           <td>Still in work</td>
           <td>Still in work</td>
           <td>Still in work</td>
-          <td><button onClick={self.handleRemove} type="button" className="btn btn-warning">Remove</button></td>
+          <td><button onClick={function(){self.handleRemove(item)}} type="button" className="btn btn-warning">Remove</button></td>
         </tr>
       )
     });
@@ -41,15 +57,20 @@ var CartComponent = React.createClass({
 var CartContainer = React.createClass({
   getInitialState: function(){
     var cartItems = JSON.parse(localStorage.getItem('order'));
-    console.log('cart', cartItems);
+    var cartArray = cartItems;
+    console.log('cart', cartArray);
     return{
       cartItems: cartItems
     }
   },
+  handleRemove: function(item){
+    console.log(item);
+    console.log(this.state.cartItems);
+  },
   render: function(){
     return(
       <TemplateComponent>
-        <CartComponent cartItems={this.state.cartItems}/>
+        <CartComponent handleRemove={this.handleRemove} cartItems={this.state.cartItems || []}/>
       </TemplateComponent>
     )
   }

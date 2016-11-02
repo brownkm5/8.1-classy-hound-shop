@@ -4,27 +4,9 @@ var TemplateComponent = require('./template.jsx');
 var OrderCollection = require('../models/model.js').OrderCollection;
 
 var CatalogComponent = React.createClass({
-  initialize: function(){
-    console.log('working');
-    return (
-      <div className="modal fade" tabindex="-1" role="dialog">
-        <div className="modal-dialog" role="document">
-          <div className="modal-content">
-            <div className="modal-header">
-              <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"></span></button>
-              <h4 className="modal-title">Modal title</h4>
-            </div>
-            <div className="modal-body">
-
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
-              <button type="button" className="btn btn-primary">Save changes</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
+  handleQuantity:function(e){
+  var quantity = e.target.value;
+  console.log(quantity);
   },
   render: function(){
     // console.log(this.props);
@@ -43,7 +25,7 @@ var CatalogComponent = React.createClass({
                   <p id='price'>$ {item.price}</p>
                 </div>
                 <div className="form-inline">
-                  <input type="text" id='quantity' className="form-control" placeholder="Quantity" />
+                  <input onChange={self.handleQuantity} type="text" id='quantity' className="form-control" placeholder="Quantity" />
                   <select className="form-control">
                     <option>Size</option>
                     <option>4" x 6"</option>
@@ -89,8 +71,12 @@ var CatalogContainer = React.createClass({
       paintings: paintingArray
     }
   },
+  // handleQuantity: function(e){
+  //   var quantity  = e.target.value;
+  //   console.log(quantity);
+  // },
   handleAddToCart: function(item){
-    console.log(item);
+    // console.log(item);
     var orderCollection = this.state.orderCollection;
 
     orderCollection.create(item);
@@ -98,13 +84,6 @@ var CatalogContainer = React.createClass({
 
     this.setState({orderCollection: orderCollection});
 
-  },
-  removeItem: function(item){
-    var orderCollection = this.state.orderCollection;
-
-    orderCollection.remove(item);
-    this.updateOrder();
-    this.setState({'orderCollection': orderCollection});
   },
   updateOrder: function(){
     var orderCollection = this.state.orderCollection;
@@ -114,7 +93,7 @@ var CatalogContainer = React.createClass({
   render: function(){
     return(
       <TemplateComponent>
-        <CatalogComponent paintings={this.state.paintings} handleAddToCart={this.handleAddToCart}/>
+        <CatalogComponent username={this.handleQuantity} paintings={this.state.paintings} handleAddToCart={this.handleAddToCart}/>
       </TemplateComponent>
     );
   }

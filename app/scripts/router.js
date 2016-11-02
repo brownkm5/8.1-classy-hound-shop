@@ -14,7 +14,7 @@ var AppRouter = Backbone.Router.extend({
   },
   index: function(){
     ReactDOM.render(
-      React.createElement(CatalogContainer),
+      React.createElement(CatalogContainer, {testing:this.testing}),
       document.getElementById('app')
     );
   },
