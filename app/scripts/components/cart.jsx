@@ -16,16 +16,16 @@ var CartComponent = React.createClass({
 
     // insert the new stringified array into LocalStorage
     localStorage.order = JSON.stringify(cartOrder);
-    
+
   },
   render: function(){
     var self = this;
     var cartData = this.props.cartItems.map(function(item){
       return(
-        <tr key={item.title}>
-          <th>{item.title}</th>
-          <td>Still in work</td>
-          <td>Still in work</td>
+        <tr key={item.item.title}>
+          <th>{item.item.title}</th>
+          <td>{item.size}</td>
+          <td>{item.quantity}</td>
           <td>Still in work</td>
           <td><button onClick={function(){self.handleRemove(item)}} type="button" className="btn btn-warning">Remove</button></td>
         </tr>

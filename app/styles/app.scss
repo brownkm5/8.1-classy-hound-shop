@@ -12,7 +12,14 @@ $icon-font-path: '../../node_modules/bootstrap-sass/assets/fonts/bootstrap/';
   box-sizing: border-box;
 }
 
+.hidden {
+  display: none;
+}
 
+
+.username{
+  margin-left: 800px;
+}
 
 .contain{
   margin: 0 15px;

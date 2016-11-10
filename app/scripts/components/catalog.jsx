@@ -2,18 +2,128 @@ var React = require('react');
 
 var TemplateComponent = require('./template.jsx');
 var OrderCollection = require('../models/model.js').OrderCollection;
+var Modal = require('react-modal');
+require('react-bootstrap');
+
+const customStyles = {
+  content : {
+    top                   : '50%',
+    left                  : '50%',
+    right                 : 'auto',
+    bottom                : 'auto',
+    marginRight           : '-50%',
+    transform             : 'translate(-50%, -50%)',
+    width                 : '500px'
+  }
+};
+
+var LoginModal = React.createClass({
+  getInitialState: function() {
+    return {
+      modalIsOpen: this.props.open,
+      username: this.props.username,
+      isHidden: false
+    };
+  },
+  //check for logged in when component is mounted, if not then load the modal
+  componentWillMount: function(){
+    this.handleModal();
+  },
+  componentWillReceiveProps: function(nextProps){
+    this.setState({username: nextProps.username});
+    console.log(this.state.username);
+    this.handleModal();
+  },
+  handleModal: function(){
+    var self = this;
+    var username = localStorage.getItem('username');
+    //open modal if there is no username
+    if (!username) {
+      self.setState({modalIsOpen: true});
+    }
+    else {
+      self.setState({modalIsOpen: false});
+    }
+  },
+  openModal: function() {
+    this.setState({modalIsOpen: true});
+  },
+  afterOpenModal: function() {
+    // references are now sync'd and can be accessed.
+    this.refs.subtitle.style.color = '#f00';
+  },
+  closeModal: function(e) {
+    this.setState({modalIsOpen: false,
+    username: e.target.value});
+    // localStorage.setItem('loggedIn', this.state.username);
+  },
+  handleUsername: function(e){
+    var self = this;
+    var username = e.target.value;
+    this.setState({username: username});
+    if (this.state.username) {
+      self.setState({isHidden:true});
+    }
+  },
+  handleSubmit: function(e){
+    e.preventDefault();
+    this.props.handleUsername(this.state.username);
+  },
+  render: function(){
+    //used for the jumbotron-div classname to hide the log in button if there is already a username
+    var username = localStorage.getItem('username');
+    return (
+      <div className={username ? 'hidden' : ''}>
+        <div className="jumbotron">
+          <div className="container">
+
+            <button onClick={this.openModal} type="button" data-target=".bd-example-modal-lg" className="btn btn-success btn-lg">Log In</button>
+          </div>
+          <Modal
+            isOpen={this.state.modalIsOpen}
+            onAfterOpen={this.afterOpenModal}
+            onRequestClose={this.closeModal}
+            style={customStyles}
+            contentLabel="Example Modal"
+          >
+
+            <h2>Please Log In</h2>
+              <form onSubmit={this.handleSubmit} className="form-group">
+                  <label htmlFor="userName">Username</label>
+                  <input onChange={this.handleUsername} type="text" className="form-control" id="userName" placeholder="Username" />
+                <button type="submit" value={this.state.username} className="btn btn-primary">Save Username</button>
+              </form>
+          </Modal>
+        </div>
+      </div>
+    );
+  }
+});
 
 var CatalogComponent = React.createClass({
+  getInitialState: function(){
+    var quantity;
+    var size;
+    return {
+      quantity: quantity,
+      size: size
+    }
+  },
   handleQuantity:function(e){
   var quantity = e.target.value;
-  console.log(quantity);
+  this.setState({quantity: quantity});
+  },
+  handleSize: function(e){
+    this.setState({size: e.target.value});
   },
   render: function(){
     // console.log(this.props);
     var self = this;
     var paintings = this.props.paintings;
-    // console.log(paintings);
+    var quantity = this.state.quantity;
+
     var paintingInfo = paintings.map(function(item){
+      var price = (item.price).toFixed(2);
       return (
         <div key={item.title}>
           <div className="col-sm-6 col-md-4">
@@ -22,18 +132,18 @@ var CatalogComponent = React.createClass({
               <div className="caption">
                 <div className="title-price">
                   <p id='title'>{item.title}</p>
-                  <p id='price'>$ {item.price}</p>
+                  <p id='price'>$ {price}</p>
                 </div>
                 <div className="form-inline">
                   <input onChange={self.handleQuantity} type="text" id='quantity' className="form-control" placeholder="Quantity" />
-                  <select className="form-control">
+                  <select onChange={self.handleSize} className="form-control">
                     <option>Size</option>
                     <option>4" x 6"</option>
                     <option>6" x 4"</option>
                     <option>8" x 10"</option>
                     <option>12" x 12"</option>
                   </select>
-                  <a href="#" onClick={function(){self.props.handleAddToCart(item)}} className="btn btn-default" role="button">Add to Cart</a>
+                  <a href="#" onClick={function(){self.props.handleAddToCart(item, self.state.quantity, self.state.size)}} className="btn btn-default" role="button">Add to Cart</a>
                 </div>
               </div>
             </div>
@@ -43,7 +153,9 @@ var CatalogComponent = React.createClass({
     });
     // console.log(paintingInfo);
     return(
-      <div>{paintingInfo}</div>
+      <div>
+        <div>{paintingInfo}</div>
+      </div>
     )
   }
 });
@@ -68,20 +180,22 @@ var CatalogContainer = React.createClass({
 
     return {
       orderCollection: orderCollection,
-      paintings: paintingArray
+      paintings: paintingArray,
+      username: '',
+
     }
   },
-  // handleQuantity: function(e){
-  //   var quantity  = e.target.value;
-  //   console.log(quantity);
-  // },
-  handleAddToCart: function(item){
+  handleQuantity: function(quantity){
+    var quantity  = e.target.value;
+    console.log(quantity);
+  },
+  handleAddToCart: function(item, quantity, size){
     // console.log(item);
     var orderCollection = this.state.orderCollection;
-
-    orderCollection.create(item);
+    console.log(quantity);
+    orderCollection.create({item: item, quantity: quantity, size:size});
     this.updateOrder();
-
+    console.log(orderCollection);
     this.setState({orderCollection: orderCollection});
 
   },
@@ -90,10 +204,16 @@ var CatalogContainer = React.createClass({
     var orderData = JSON.stringify(orderCollection.toJSON());
     localStorage.setItem('order', orderData);
   },
+  handleUsername: function(username){
+    this.setState({username: username});
+    localStorage.setItem('username', username);
+
+  },
   render: function(){
     return(
       <TemplateComponent>
-        <CatalogComponent username={this.handleQuantity} paintings={this.state.paintings} handleAddToCart={this.handleAddToCart}/>
+        <LoginModal username={this.state.username} handleUsername={this.handleUsername} />
+        <CatalogComponent paintings={this.state.paintings} handleAddToCart={this.handleAddToCart}/>
       </TemplateComponent>
     );
   }
