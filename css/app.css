@@ -5763,6 +5763,12 @@ button.close {
 *::after {
   box-sizing: border-box; }
 
+.hidden {
+  display: none; }
+
+.username {
+  margin-left: 800px; }
+
 .contain {
   margin: 0 15px; }
 
